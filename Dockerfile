@@ -1,13 +1,13 @@
 # Build stage
-FROM golang:1.24.4-alpine AS builder
+FROM golang:1.26.11-alpine3.24@sha256:ae52b5bc6ed045a9ed26ab03dc19327a802a9cc9aa8b27ed57f5c6b60579b0bb AS builder
 
 WORKDIR /app
 
 # Instala dependências do sistema
 RUN apk add --no-cache git
 
-# Instala golang-migrate
-RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+# Instala uma versão fixa do golang-migrate para manter builds reproduzíveis.
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.20.1
 
 # Copia os arquivos de dependência (inclui o modfile community)
 COPY go.mod go.sum go.community.mod go.community.sum ./
@@ -27,7 +27,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -modfile=go.community.mod -o /app/main ./c
 RUN ls -la /app/main
 
 # Final stage
-FROM alpine:latest
+FROM alpine:3.24@sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf
 
 WORKDIR /app
 
@@ -59,4 +59,4 @@ RUN ls -la ./main ./migrate ./entrypoint.sh
 EXPOSE 5555
 
 # Executa o script de inicialização
-CMD ["./entrypoint.sh"] 
+CMD ["./entrypoint.sh"]
