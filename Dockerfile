@@ -1,13 +1,17 @@
 # Build stage
 FROM golang:1.24.4-alpine AS builder
 
+# Keep the migration CLI pinned to a release that supports this builder's Go
+# toolchain. Using @latest can silently select a release requiring a newer Go.
+ARG MIGRATE_VERSION=v4.19.1
+
 WORKDIR /app
 
 # Instala dependências do sistema
 RUN apk add --no-cache git
 
 # Instala golang-migrate
-RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@${MIGRATE_VERSION}
 
 # Copia os arquivos de dependência (inclui o modfile community)
 COPY go.mod go.sum go.community.mod go.community.sum ./
@@ -59,4 +63,4 @@ RUN ls -la ./main ./migrate ./entrypoint.sh
 EXPOSE 5555
 
 # Executa o script de inicialização
-CMD ["./entrypoint.sh"] 
+CMD ["./entrypoint.sh"]

@@ -8,6 +8,7 @@ DB_URL_ADMIN = postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/postgr
 DB_URL_WITH_CUSTOM_SCHEMA = postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)&x-migrations-table=evo_core_schema_community_migrations
 MIGRATIONS_DIR = migrations
 MIGRATION_COUNT ?= 1
+MIGRATE_VERSION ?= v4.19.1
 
 # =============================================================================
 # PADRÃO PADRONIZADO - COMANDOS PRINCIPAIS
@@ -25,7 +26,7 @@ install:
 	@echo "🔧 Instalando golang-migrate..."
 	@if ! command -v migrate &> /dev/null; then \
 		echo "Instalando golang-migrate..."; \
-		go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest; \
+		go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@$(MIGRATE_VERSION); \
 	else \
 		echo "golang-migrate já está instalado"; \
 	fi
